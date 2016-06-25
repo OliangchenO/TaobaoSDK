@@ -1,0 +1,8 @@
+{
+	modules:[
+		{
+		    name:'alibaba',
+		    class:'com.module.taobao.AliBaiChuan'
+		}
+	]
+}
