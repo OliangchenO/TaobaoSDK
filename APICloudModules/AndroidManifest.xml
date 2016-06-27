@@ -85,6 +85,15 @@
         </activity>
         <activity android:configChanges="orientation|keyboardHidden|navigation" android:exported="false" android:name="com.alipay.sdk.auth.AuthActivity" android:screenOrientation="behind">
         </activity>
+        
+        <activity
+            android:name="com.module.taobao.LoginActivity"
+        	android:screenOrientation="portrait"
+        	android:configChanges="orientation|locale" />
+        <activity
+            android:name="com.module.taobao.CartActivity"
+        	android:screenOrientation="portrait"
+        	android:configChanges="orientation|locale" />
     </application>
 
 </manifest>

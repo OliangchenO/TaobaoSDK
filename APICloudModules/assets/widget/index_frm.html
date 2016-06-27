@@ -35,6 +35,27 @@ p {
 			alert(JSON.stringify(err));
 		})
 	}
+	
+	function getUserInfo(){
+		alibaba.getUserInfo(function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
+	
+	function logout(){
+		alibaba.logout(function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
+	
+	function showCart(){
+		alibaba.showCart(function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
 </script>
 </head>
 <body>
@@ -42,8 +63,14 @@ p {
 		<div id="main">
 			<div class='itemtitle'>初始化</div>
 			<div class="clickbtn" tapmode="active" onclick="asyncInit()">点击弹出</div>
-			<div class='itemtitle'>denglu</div>
+			<div class='itemtitle'>登陆</div>
 			<div class="clickbtn" tapmode="active" onclick="showLogin()">点击弹出</div>
+			<div class='itemtitle'>获取用户信息</div>
+			<div class="clickbtn" tapmode="active" onclick="getUserInfo()">点击弹出</div>
+			<div class='itemtitle'>登出</div>
+			<div class="clickbtn" tapmode="active" onclick="logout()">点击弹出</div>
+			<div class='itemtitle'>打开购物车</div>
+			<div class="clickbtn" tapmode="active" onclick="showCart()">点击弹出</div>
 		</div>
 		
 	</div>
