@@ -5,8 +5,13 @@ import org.json.JSONObject;
 
 import com.alibaba.sdk.android.AlibabaSDK;
 import com.alibaba.sdk.android.login.LoginService;
+import com.alibaba.sdk.android.session.SessionListener;
 import com.alibaba.sdk.android.session.model.Session;
 import com.alibaba.sdk.android.session.model.User;
+import com.alibaba.sdk.android.trade.CartService;
+import com.alibaba.sdk.android.trade.OrderService;
+import com.alibaba.sdk.android.trade.callback.TradeProcessCallback;
+import com.alibaba.sdk.android.trade.model.TradeResult;
 import com.taobao.tae.sdk.callback.InitResultCallback;
 import com.uzmap.pkg.uzcore.UZWebView;
 import com.uzmap.pkg.uzcore.uzmodule.UZModule;
@@ -14,6 +19,7 @@ import com.uzmap.pkg.uzcore.uzmodule.UZModuleContext;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.widget.Toast;
 
 public class AliBaiChuan extends UZModule {
 	private UZModuleContext mJsCallback;
@@ -29,6 +35,20 @@ public class AliBaiChuan extends UZModule {
 
 			@Override
 			public void onSuccess() {
+				LoginService loginService = AlibabaSDK.getService(LoginService.class);
+                loginService.setSessionListener(new SessionListener() {
+
+                    @Override
+                    public void onStateChanged(Session session) {
+                        if (session != null) {
+                            Toast.makeText(getContext(),
+                                    "session状态改变" + session.getUserId() + session.getUser() + session.isLogin(),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "session is null", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 				JSONObject ret = new JSONObject();
 				try {
 					ret.put("msg", "初始化成功");
@@ -86,21 +106,51 @@ public class AliBaiChuan extends UZModule {
 		startActivityForResult(intent, ACTIVITY_REQUEST_CODE_A);
 	}
 
-	public void jsmethod_showCart(UZModuleContext moduleContext) {
-		mJsCallback = moduleContext;
-		Intent intent = new Intent(getContext(), CartActivity.class);
-		intent.putExtra("option", Constants.SHOWCART_INDEX);
-		startActivityForResult(intent, ACTIVITY_REQUEST_CODE_A);
-	}
+	public void jsmethod_showCart(final UZModuleContext moduleContext) {
+		final JSONObject ret = new JSONObject();
+		final JSONObject err = new JSONObject();
+		try {
+			CartService cartService = AlibabaSDK.getService(CartService.class);
+			cartService.showCart(getContext(), new TradeProcessCallback() {
 
-	public void jsmethod_addItem2Cart(UZModuleContext moduleContext) {
-		mJsCallback = moduleContext;
-		Intent intent = new Intent(getContext(), CartActivity.class);
-		intent.putExtra("option", Constants.SHOWCART_INDEX);
-		String itemId = moduleContext.optString("itemId");
-		intent.putExtra("itemId", itemId);
-		startActivityForResult(intent, ACTIVITY_REQUEST_CODE_A);
+				@Override
+				public void onFailure(int code, String message) {
+					try {
+						err.put("code", code);
+						err.put("msg", message);
+						moduleContext.error(ret, err, true);
+					} catch (JSONException e) {
+					}
+					
+				}
+
+				@Override
+				public void onPaySuccess(TradeResult tradeResult) {
+					try {
+						//tradeResult.payFailedOrders;
+						ret.put("msg", "打开购物车成功");
+						moduleContext.success(ret, true);
+					} catch (JSONException e) {
+					}
+				}
+			});
+		} catch (Exception e) {
+			try {
+				err.put("code", ErrorEunm.UN_ASYNCINIT.getCode());
+				err.put("msg", ErrorEunm.UN_ASYNCINIT.getMsg());
+				moduleContext.error(ret, err, true);
+			} catch (JSONException e1) {
+			}
+		}
 	}
+	
+	public void jsmethod_showMyOrders(final UZModuleContext moduleContext) {
+		//订单服务
+		OrderService orderService = AlibabaSDK.getService(OrderService.class);
+		//orderService.showOrder(arg0, arg1, arg2);
+		
+	}
+	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK && requestCode == ACTIVITY_REQUEST_CODE_A) {

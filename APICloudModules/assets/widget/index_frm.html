@@ -56,6 +56,14 @@ p {
 			alert(JSON.stringify(err));
 		})
 	}
+	
+	function addItem2Cart(){
+		var itemId = {itemId:'AAEIb-fzAAgOrLpFItbuaC9f'};
+		alibaba.addItem2Cart(itemId,function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
 </script>
 </head>
 <body>
@@ -71,6 +79,8 @@ p {
 			<div class="clickbtn" tapmode="active" onclick="logout()">点击弹出</div>
 			<div class='itemtitle'>打开购物车</div>
 			<div class="clickbtn" tapmode="active" onclick="showCart()">点击弹出</div>
+			<div class='itemtitle'>添加购物车</div>
+			<div class="clickbtn" tapmode="active" onclick="addItem2Cart()">点击弹出</div>
 		</div>
 		
 	</div>

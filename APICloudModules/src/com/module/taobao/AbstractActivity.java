@@ -16,7 +16,7 @@ public class AbstractActivity extends Activity {
         } else if (resultCode == RESULT_CANCELED) {
             // 用户主动取消操作.
         } else if (resultCode == -2) {
-            // error,淘宝将返回错误码，同样解析intent中的result项，形式如下�?
+            // error,淘宝将返回错误码，同样解析intent中的result项，形式如下
             Toast.makeText(this, data.getStringExtra("result"), Toast.LENGTH_SHORT).show();
         }
         CallbackContext.onActivityResult(requestCode, resultCode, data);
