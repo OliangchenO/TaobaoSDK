@@ -1,5 +1,7 @@
 package com.module.taobao;
 
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -127,8 +129,12 @@ public class AliBaiChuan extends UZModule {
 				@Override
 				public void onPaySuccess(TradeResult tradeResult) {
 					try {
-						//tradeResult.payFailedOrders;
-						ret.put("msg", "打开购物车成功");
+						List<Long> payFailedOrders = tradeResult.payFailedOrders;
+						List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+						
+						ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+						ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+						
 						moduleContext.success(ret, true);
 					} catch (JSONException e) {
 					}
@@ -147,7 +153,7 @@ public class AliBaiChuan extends UZModule {
 	public void jsmethod_showMyOrders(final UZModuleContext moduleContext) {
 		//订单服务
 		OrderService orderService = AlibabaSDK.getService(OrderService.class);
-		//orderService.showOrder(arg0, arg1, arg2);
+		//orderService.showOrder
 		
 	}
 	
