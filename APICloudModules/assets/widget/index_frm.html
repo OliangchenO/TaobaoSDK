@@ -51,15 +51,46 @@ p {
 	}
 	
 	function showCart(){
-		alibaba.showCart(function(ret,err){
+		alibaba.showMyCartsPage(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
-	function addItem2Cart(){
-		var itemId = {itemId:'AAEIb-fzAAgOrLpFItbuaC9f'};
-		alibaba.addItem2Cart(itemId,function(ret,err){
+	function showOrder(){
+		var param = {type:1,allOrder:false};
+		alibaba.showMyOrdersPage(param,function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
+	
+	function showItemDetailPage(){
+		var param = {itemId:'527499129604'};
+		alibaba.showItemDetailPage(param, function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
+	
+	function showMyCardCouponsPage(){
+		alibaba.showMyCardCouponsPage(function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
+	
+	function showPromotionsPage(){
+		var param = {shop:"123456"};
+		alibaba.showPromotionsPage(param, function(ret,err){
+			alert(JSON.stringify(ret));
+			alert(JSON.stringify(err));
+		})
+	}
+	
+	function showPageByUrl(){
+		var param = {url:"https://chaoshi.detail.tmall.com/item.htm?spm=a3204.8100662.4126610234.2.8EcSy0&id=529349310313&acm=lb-zebra-169886-1116122.1003.4.929918&scm=1003.4.lb-zebra-169886-1116122.ITEM_529349310313_929918"};
+		alibaba.showPageByUrl(param, function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
@@ -77,10 +108,18 @@ p {
 			<div class="clickbtn" tapmode="active" onclick="getUserInfo()">点击弹出</div>
 			<div class='itemtitle'>登出</div>
 			<div class="clickbtn" tapmode="active" onclick="logout()">点击弹出</div>
+			<div class='itemtitle'>打开商品详情</div>
+			<div class="clickbtn" tapmode="active" onclick="showItemDetailPage()">点击弹出</div>
 			<div class='itemtitle'>打开购物车</div>
 			<div class="clickbtn" tapmode="active" onclick="showCart()">点击弹出</div>
-			<div class='itemtitle'>添加购物车</div>
-			<div class="clickbtn" tapmode="active" onclick="addItem2Cart()">点击弹出</div>
+			<div class='itemtitle'>打开订单</div>
+			<div class="clickbtn" tapmode="active" onclick="showOrder()">点击弹出</div>
+			<div class='itemtitle'>打开我的卡包</div>
+			<div class="clickbtn" tapmode="active" onclick="showMyCardCouponsPage()">点击弹出</div>
+			<div class='itemtitle'>打开我的优惠券</div>
+			<div class="clickbtn" tapmode="active" onclick="showPromotionsPage()">点击弹出</div>
+			<div class='itemtitle'>根据链接打开商品</div>
+			<div class="clickbtn" tapmode="active" onclick="showPageByUrl()">点击弹出</div>
 		</div>
 		
 	</div>

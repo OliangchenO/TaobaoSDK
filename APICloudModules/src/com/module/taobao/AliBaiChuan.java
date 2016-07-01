@@ -1,5 +1,9 @@
 package com.module.taobao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -7,11 +11,17 @@ import com.alibaba.sdk.android.AlibabaSDK;
 import com.alibaba.sdk.android.login.LoginService;
 import com.alibaba.sdk.android.session.SessionListener;
 import com.alibaba.sdk.android.session.model.Session;
-import com.alibaba.sdk.android.session.model.User;
-import com.alibaba.sdk.android.trade.CartService;
-import com.alibaba.sdk.android.trade.OrderService;
+import com.alibaba.sdk.android.trade.*;
 import com.alibaba.sdk.android.trade.callback.TradeProcessCallback;
+import com.alibaba.sdk.android.trade.model.TaokeParams;
 import com.alibaba.sdk.android.trade.model.TradeResult;
+import com.alibaba.sdk.android.trade.page.ItemDetailPage;
+import com.alibaba.sdk.android.trade.page.MyCardCouponsPage;
+import com.alibaba.sdk.android.trade.page.MyCartsPage;
+import com.alibaba.sdk.android.trade.page.MyOrdersPage;
+import com.alibaba.sdk.android.trade.page.Page;
+import com.alibaba.sdk.android.trade.page.PromotionsPage;
+import com.ta.utdid2.android.utils.StringUtils;
 import com.taobao.tae.sdk.callback.InitResultCallback;
 import com.uzmap.pkg.uzcore.UZWebView;
 import com.uzmap.pkg.uzcore.uzmodule.UZModule;
@@ -24,7 +34,6 @@ import android.widget.Toast;
 public class AliBaiChuan extends UZModule {
 	private UZModuleContext mJsCallback;
 	static final int ACTIVITY_REQUEST_CODE_A = 100;
-
 	public AliBaiChuan(UZWebView webView) {
 		super(webView);
 	}
@@ -36,22 +45,23 @@ public class AliBaiChuan extends UZModule {
 			@Override
 			public void onSuccess() {
 				LoginService loginService = AlibabaSDK.getService(LoginService.class);
-                loginService.setSessionListener(new SessionListener() {
+				loginService.setSessionListener(new SessionListener() {
 
-                    @Override
-                    public void onStateChanged(Session session) {
-                        if (session != null) {
-                            Toast.makeText(getContext(),
-                                    "session状态改变" + session.getUserId() + session.getUser() + session.isLogin(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(getContext(), "session is null", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+					@Override
+					public void onStateChanged(Session session) {
+						if (session != null) {
+							Toast.makeText(getContext(),
+									"session状态改变" + session.getUserId() + session.getUser() + session.isLogin(),
+									Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(getContext(), "session is null", Toast.LENGTH_SHORT).show();
+						}
+					}
+				});
 				JSONObject ret = new JSONObject();
 				try {
-					ret.put("msg", "初始化成功");
+					ret.put("msg", StatusEunm.SUCCESS.getMsg());
+					ret.put("code", StatusEunm.SUCCESS.getCode());
 					moduleContext.success(ret, true);
 				} catch (JSONException e) {
 				}
@@ -72,33 +82,42 @@ public class AliBaiChuan extends UZModule {
 	}
 
 	public void jsmethod_showLogin(final UZModuleContext moduleContext) {
+		// loginService.showLogin(getContext(), new InternalLoginCallback());
 		mJsCallback = moduleContext;
 		Intent intent = new Intent(getContext(), LoginActivity.class);
 		intent.putExtra("option", Constants.SHOWLOGIN_INDEX);
 		startActivityForResult(intent, ACTIVITY_REQUEST_CODE_A);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public void jsmethod_getUserInfo(final UZModuleContext moduleContext) {
 		LoginService loginService = AlibabaSDK.getService(LoginService.class);
 		JSONObject ret = new JSONObject();
 		JSONObject err = new JSONObject();
 		try {
 			Session session = loginService.getSession();
-			User user = session.getUser();
-			ret.put("nick", user.nick);
-			ret.put("id", user.id);
-			ret.put("avatarUrl", user.avatarUrl);
+			String AuthorizationCode = session.getAuthorizationCode();
+			ret.put("authorizationCode", AuthorizationCode);
+			ret.put("loginTime", session.getLoginTime());
+			Map otherInfo = session.getOtherInfo();
+			ret.put("otherInfo", otherInfo == null ? "" : String.valueOf(otherInfo));
+			ret.put("nick", session.getUser().nick);
+			ret.put("avatarUrl", session.getUser().avatarUrl);
+			ret.put("userId", session.getUserId());
+			ret.put("isLogin", session.isLogin());
+			ret.put("msg", StatusEunm.SUCCESS.getMsg());
+			ret.put("code", StatusEunm.SUCCESS.getCode());
 			moduleContext.success(ret, true);
 		} catch (Exception e) {
 			try {
-				err.put("code", ErrorEunm.UN_ASYNCINIT.getCode());
-				err.put("msg", ErrorEunm.UN_ASYNCINIT.getMsg());
+				err.put("code", StatusEunm.UN_ASYNCINIT.getCode());
+				err.put("msg", StatusEunm.UN_ASYNCINIT.getMsg());
 				moduleContext.error(ret, err, true);
 			} catch (JSONException e1) {
 			}
 		}
 	}
-	
+
 	public void jsmethod_logout(UZModuleContext moduleContext) {
 		mJsCallback = moduleContext;
 		Intent intent = new Intent(getContext(), LoginActivity.class);
@@ -106,12 +125,26 @@ public class AliBaiChuan extends UZModule {
 		startActivityForResult(intent, ACTIVITY_REQUEST_CODE_A);
 	}
 
-	public void jsmethod_showCart(final UZModuleContext moduleContext) {
+	public void jsmethod_showItemDetailPage(final UZModuleContext moduleContext) {
 		final JSONObject ret = new JSONObject();
 		final JSONObject err = new JSONObject();
 		try {
-			CartService cartService = AlibabaSDK.getService(CartService.class);
-			cartService.showCart(getContext(), new TradeProcessCallback() {
+			Map<String, String> exParams = new HashMap<String, String>();
+			String isv_code = moduleContext.optString("isv_code");
+			if(!StringUtils.isEmpty(isv_code)){
+				exParams.put(TradeConstants.ISV_CODE, isv_code);
+			}
+			String itemId = moduleContext.optString("itemId");
+			ItemDetailPage itemDetailPage = null;
+			if(!StringUtils.isEmpty(itemId)){
+				itemDetailPage = new ItemDetailPage(itemId, exParams);
+			}else{
+				err.put("code", StatusEunm.ILLEGAL_ARGUMENT.getCode());
+				err.put("msg", StatusEunm.ILLEGAL_ARGUMENT.getMsg());
+				moduleContext.error(ret, err, true);
+			}
+			TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+			tradeService.show(itemDetailPage, null, mContext, null, new TradeProcessCallback() {
 
 				@Override
 				public void onFailure(int code, String message) {
@@ -121,14 +154,19 @@ public class AliBaiChuan extends UZModule {
 						moduleContext.error(ret, err, true);
 					} catch (JSONException e) {
 					}
-					
+
 				}
 
 				@Override
 				public void onPaySuccess(TradeResult tradeResult) {
 					try {
-						//tradeResult.payFailedOrders;
-						ret.put("msg", "打开购物车成功");
+						List<Long> payFailedOrders = tradeResult.payFailedOrders;
+						List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+						ret.put("msg", StatusEunm.SUCCESS.getMsg());
+						ret.put("code", StatusEunm.SUCCESS.getCode());
+						ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+						ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+
 						moduleContext.success(ret, true);
 					} catch (JSONException e) {
 					}
@@ -136,21 +174,251 @@ public class AliBaiChuan extends UZModule {
 			});
 		} catch (Exception e) {
 			try {
-				err.put("code", ErrorEunm.UN_ASYNCINIT.getCode());
-				err.put("msg", ErrorEunm.UN_ASYNCINIT.getMsg());
+				err.put("code", StatusEunm.UN_ASYNCINIT.getCode());
+				err.put("msg", StatusEunm.UN_ASYNCINIT.getMsg());
+				moduleContext.error(ret, err, true);
+			} catch (JSONException e1) {
+			}
+		}
+		
+	}
+	
+	public void jsmethod_showMyCartsPage(final UZModuleContext moduleContext) {
+		final JSONObject ret = new JSONObject();
+		final JSONObject err = new JSONObject();
+		try {
+			MyCartsPage myCartsPage = new MyCartsPage();
+			String isv_code = moduleContext.optString("isv_code");
+			if (!StringUtils.isEmpty(isv_code)) {
+				TradeConfigs.defaultISVCode = isv_code; // 传入isv_code
+			}
+			TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+			tradeService.show(myCartsPage, null, mContext, null, new TradeProcessCallback() {
+
+				@Override
+				public void onFailure(int code, String message) {
+					try {
+						err.put("code", code);
+						err.put("msg", message);
+						moduleContext.error(ret, err, true);
+					} catch (JSONException e) {
+					}
+
+				}
+
+				@Override
+				public void onPaySuccess(TradeResult tradeResult) {
+					try {
+						List<Long> payFailedOrders = tradeResult.payFailedOrders;
+						List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+						ret.put("msg", StatusEunm.SUCCESS.getMsg());
+						ret.put("code", StatusEunm.SUCCESS.getCode());
+						ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+						ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+
+						moduleContext.success(ret, true);
+					} catch (JSONException e) {
+					}
+				}
+			});
+		} catch (Exception e) {
+			try {
+				err.put("code", StatusEunm.UN_ASYNCINIT.getCode());
+				err.put("msg", StatusEunm.UN_ASYNCINIT.getMsg());
 				moduleContext.error(ret, err, true);
 			} catch (JSONException e1) {
 			}
 		}
 	}
-	
-	public void jsmethod_showMyOrders(final UZModuleContext moduleContext) {
-		//订单服务
-		OrderService orderService = AlibabaSDK.getService(OrderService.class);
-		//orderService.showOrder(arg0, arg1, arg2);
-		
+
+	public void jsmethod_showMyOrdersPage(final UZModuleContext moduleContext) {
+		final JSONObject ret = new JSONObject();
+		final JSONObject err = new JSONObject();
+		int type = moduleContext.optInt("type", 0);// 0：全部；1：待付款；2：待发货；3：待收货；4：待评价。若传入的不是这几个数字，则跳转到“全部”
+		boolean allOrder = moduleContext.optBoolean("allOrder", false);
+		MyOrdersPage myOrdersPage = new MyOrdersPage(type, allOrder);
+		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+		tradeService.show(myOrdersPage, null, mContext, null, new TradeProcessCallback() {
+
+			@Override
+			public void onFailure(int code, String message) {
+				try {
+					err.put("code", code);
+					err.put("msg", message);
+					moduleContext.error(ret, err, true);
+				} catch (JSONException e) {
+				}
+
+			}
+
+			@Override
+			public void onPaySuccess(TradeResult tradeResult) {
+				try {
+					List<Long> payFailedOrders = tradeResult.payFailedOrders;
+					List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+					ret.put("msg", StatusEunm.SUCCESS.getMsg());
+					ret.put("code", StatusEunm.SUCCESS.getCode());
+					ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+					ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+
+					moduleContext.success(ret, true);
+				} catch (JSONException e) {
+				}
+			}
+		});
 	}
 	
+	/**
+	 * 打开我的卡券包页
+	 * @param moduleContext
+	 */
+	public void jsmethod_showMyCardCouponsPage(final UZModuleContext moduleContext) {
+		final JSONObject ret = new JSONObject();
+		final JSONObject err = new JSONObject();
+		MyCardCouponsPage myCardCouponsPage = new MyCardCouponsPage();
+		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+		tradeService.show(myCardCouponsPage, null, mContext, null, new TradeProcessCallback() {
+
+			@Override
+			public void onFailure(int code, String message) {
+				try {
+					err.put("code", code);
+					err.put("msg", message);
+					moduleContext.error(ret, err, true);
+				} catch (JSONException e) {
+				}
+
+			}
+
+			@Override
+			public void onPaySuccess(TradeResult tradeResult) {
+				try {
+					List<Long> payFailedOrders = tradeResult.payFailedOrders;
+					List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+					ret.put("msg", StatusEunm.SUCCESS.getMsg());
+					ret.put("code", StatusEunm.SUCCESS.getCode());
+					ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+					ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+
+					moduleContext.success(ret, true);
+				} catch (JSONException e) {
+				}
+			}
+		});
+	}
+
+	// 打开优惠券页
+	public void jsmethod_showPromotionsPage(final UZModuleContext moduleContext) {
+		final JSONObject ret = new JSONObject();
+		final JSONObject err = new JSONObject();
+		String shop = moduleContext.optString("shopId");
+		PromotionsPage promotionsPage = null;
+		if (StringUtils.isEmpty(shop)) {
+			promotionsPage = new PromotionsPage("shop", shop);
+		} else {
+			try {
+				err.put("code", StatusEunm.ILLEGAL_ARGUMENT.getCode());
+				err.put("msg", StatusEunm.ILLEGAL_ARGUMENT.getMsg());
+				moduleContext.error(ret, err, true);
+			} catch (JSONException e) {
+			}
+		}
+		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+		tradeService.show(promotionsPage, null, mContext, null, new TradeProcessCallback() {
+
+			@Override
+			public void onFailure(int code, String message) {
+				try {
+					err.put("code", code);
+					err.put("msg", message);
+					moduleContext.error(ret, err, true);
+				} catch (JSONException e) {
+				}
+
+			}
+
+			@Override
+			public void onPaySuccess(TradeResult tradeResult) {
+				try {
+					List<Long> payFailedOrders = tradeResult.payFailedOrders;
+					List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+					ret.put("msg", StatusEunm.SUCCESS.getMsg());
+					ret.put("code", StatusEunm.SUCCESS.getCode());
+					ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+					ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+
+					moduleContext.success(ret, true);
+				} catch (JSONException e) {
+				}
+			}
+		});
+	}
+
+	/**
+	 * 根据商品链接打开商品页面
+	 * @param moduleContext 
+	 * url：必填 打开的链接地址
+	 * isv_code： 选填，
+	 * pid：选填
+	 */
+	public void jsmethod_showPageByUrl(final UZModuleContext moduleContext) {
+		final JSONObject ret = new JSONObject();
+		final JSONObject err = new JSONObject();
+		
+		String url = moduleContext.optString("url");
+		Page page = null;
+		if(!StringUtils.isEmpty(url)){
+			String isv_code = moduleContext.optString("isv_code");
+			Map<String, Object> exParams = new HashMap<String, Object>();
+			if(!StringUtils.isEmpty(isv_code)){
+				exParams.put(TradeConstants.ISV_CODE, isv_code);
+			}
+			page = new Page(url, exParams);
+		} else {
+			try {
+				err.put("code", StatusEunm.ILLEGAL_ARGUMENT.getCode());
+				err.put("msg", StatusEunm.ILLEGAL_ARGUMENT.getMsg());
+				moduleContext.error(ret, err, true);
+			} catch (JSONException e) {
+			}
+		}
+		
+		TaokeParams taokeParams = new TaokeParams(); 
+		String pid = moduleContext.optString("pid");
+		if(!StringUtils.isEmpty(pid)){
+			taokeParams.pid = pid;
+		}
+		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+		tradeService.show(page, taokeParams, mContext, null, new TradeProcessCallback(){
+			  
+			@Override
+			public void onFailure(int code, String message) {
+				try {
+					err.put("code", code);
+					err.put("msg", message);
+					moduleContext.error(ret, err, true);
+				} catch (JSONException e) {
+				}
+
+			}
+
+			@Override
+			public void onPaySuccess(TradeResult tradeResult) {
+				try {
+					List<Long> payFailedOrders = tradeResult.payFailedOrders;
+					List<Long> paySuccessOrders = tradeResult.paySuccessOrders;
+					ret.put("msg", StatusEunm.SUCCESS.getMsg());
+					ret.put("code", StatusEunm.SUCCESS.getCode());
+					ret.put("payFailedOrders", DataUtils.toString(payFailedOrders));
+					ret.put("paySuccessOrders", DataUtils.toString(paySuccessOrders));
+
+					moduleContext.success(ret, true);
+				} catch (JSONException e) {
+				}
+			}
+		});
+	}
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == Activity.RESULT_OK && requestCode == ACTIVITY_REQUEST_CODE_A) {
@@ -161,7 +429,6 @@ public class AliBaiChuan extends UZModule {
 					mJsCallback.success(ret, true);
 					mJsCallback = null;
 				} catch (JSONException e) {
-					e.printStackTrace();
 				}
 			}
 		} else {

@@ -57,7 +57,8 @@ public class LoginActivity extends AbstractActivity {
 				@Override
 				public void onSuccess() {
 					try {
-						json.put("msg", "登出成功");
+						json.put("msg", StatusEunm.SUCCESS.getMsg());
+						json.put("code", StatusEunm.SUCCESS.getCode());
 					} catch (JSONException e) {
 					}
 					resultData.putExtra("result", json.toString());
@@ -67,8 +68,8 @@ public class LoginActivity extends AbstractActivity {
 			});
 		} catch (Exception e) {
 			try {
-				json.put("code", ErrorEunm.UN_ASYNCINIT.getCode());
-				json.put("msg", ErrorEunm.UN_ASYNCINIT.getMsg());
+				json.put("code", StatusEunm.UN_ASYNCINIT.getCode());
+				json.put("msg", StatusEunm.UN_ASYNCINIT.getMsg());
 			} catch (JSONException e1) {
 			}
 			resultData.putExtra("result", json.toString());
@@ -82,8 +83,8 @@ public class LoginActivity extends AbstractActivity {
 			loginService.showLogin(LoginActivity.this, new InternalLoginCallback());
 		} catch (Exception e2) {
 			try {
-				json.put("code", ErrorEunm.UN_ASYNCINIT.getCode());
-				json.put("msg", ErrorEunm.UN_ASYNCINIT.getMsg());
+				json.put("code", StatusEunm.UN_ASYNCINIT.getCode());
+				json.put("msg", StatusEunm.UN_ASYNCINIT.getMsg());
 			} catch (JSONException e1) {
 			}
 			resultData.putExtra("result", json.toString());
@@ -109,6 +110,8 @@ public class LoginActivity extends AbstractActivity {
 				json.put("avatarUrl", session.getUser().avatarUrl);
 				json.put("userId", session.getUserId());
 				json.put("isLogin", session.isLogin());
+				json.put("msg", StatusEunm.SUCCESS.getMsg());
+				json.put("code", StatusEunm.SUCCESS.getCode());
 			} catch (JSONException e1) {
 			}
 //			CookieManager.getInstance().removeAllCookie();

@@ -54,8 +54,6 @@
         </activity>
         
         <activity android:name="com.alibaba.sdk.android.login.ui.LoginWebViewActivity"/>
-        <activity android:name="com.alibaba.sdk.android.login.ui.QrLoginConfirmActivity"/>
-        <activity android:name="com.alibaba.sdk.android.login.ui.QrLoginActivity" android:theme="@style/tae_sdk_login_qr_activity_style"/>
         <activity android:name="com.alibaba.sdk.android.webview.BaseWebViewActivity"/>
         <activity android:name="com.alibaba.sdk.android.webview.feedback.FeedbackActivity" android:theme="@style/feedback_title">
         </activity>
