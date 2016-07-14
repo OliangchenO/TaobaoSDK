@@ -15,12 +15,7 @@ import com.alibaba.sdk.android.trade.*;
 import com.alibaba.sdk.android.trade.callback.TradeProcessCallback;
 import com.alibaba.sdk.android.trade.model.TaokeParams;
 import com.alibaba.sdk.android.trade.model.TradeResult;
-import com.alibaba.sdk.android.trade.page.ItemDetailPage;
-import com.alibaba.sdk.android.trade.page.MyCardCouponsPage;
-import com.alibaba.sdk.android.trade.page.MyCartsPage;
-import com.alibaba.sdk.android.trade.page.MyOrdersPage;
-import com.alibaba.sdk.android.trade.page.Page;
-import com.alibaba.sdk.android.trade.page.PromotionsPage;
+import com.alibaba.sdk.android.trade.page.*;
 import com.ta.utdid2.android.utils.StringUtils;
 import com.taobao.tae.sdk.callback.InitResultCallback;
 import com.uzmap.pkg.uzcore.UZWebView;
@@ -136,8 +131,13 @@ public class AliBaiChuan extends UZModule {
 				err.put("msg", StatusEunm.ILLEGAL_ARGUMENT.getMsg());
 				moduleContext.error(ret, err, true);
 			}
+			TaokeParams taokeParams = new TaokeParams();
+			String pid = moduleContext.optString("pid");
+			if (!StringUtils.isEmpty(pid)) {
+				taokeParams.pid = pid;
+			}
 			TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-			tradeService.show(itemDetailPage, null, mContext, null, new TradeProcessCallback() {
+			tradeService.show(itemDetailPage, taokeParams, mContext, null, new TradeProcessCallback() {
 
 				@Override
 				public void onFailure(int code, String message) {
@@ -185,8 +185,13 @@ public class AliBaiChuan extends UZModule {
 			if (!StringUtils.isEmpty(isv_code)) {
 				TradeConfigs.defaultISVCode = isv_code; // 传入isv_code
 			}
+			TaokeParams taokeParams = new TaokeParams();
+			String pid = moduleContext.optString("pid");
+			if (!StringUtils.isEmpty(pid)) {
+				taokeParams.pid = pid;
+			}
 			TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-			tradeService.show(myCartsPage, null, mContext, null, new TradeProcessCallback() {
+			tradeService.show(myCartsPage, taokeParams, mContext, null, new TradeProcessCallback() {
 
 				@Override
 				public void onFailure(int code, String message) {
@@ -230,8 +235,13 @@ public class AliBaiChuan extends UZModule {
 		int type = moduleContext.optInt("type", 0);// 0：全部；1：待付款；2：待发货；3：待收货；4：待评价。若传入的不是这几个数字，则跳转到“全部”
 		boolean allOrder = moduleContext.optBoolean("allOrder", false);
 		MyOrdersPage myOrdersPage = new MyOrdersPage(type, allOrder);
+		TaokeParams taokeParams = new TaokeParams();
+		String pid = moduleContext.optString("pid");
+		if (!StringUtils.isEmpty(pid)) {
+			taokeParams.pid = pid;
+		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-		tradeService.show(myOrdersPage, null, mContext, null, new TradeProcessCallback() {
+		tradeService.show(myOrdersPage, taokeParams, mContext, null, new TradeProcessCallback() {
 
 			@Override
 			public void onFailure(int code, String message) {
@@ -270,8 +280,13 @@ public class AliBaiChuan extends UZModule {
 		final JSONObject ret = new JSONObject();
 		final JSONObject err = new JSONObject();
 		MyCardCouponsPage myCardCouponsPage = new MyCardCouponsPage();
+		TaokeParams taokeParams = new TaokeParams();
+		String pid = moduleContext.optString("pid");
+		if (!StringUtils.isEmpty(pid)) {
+			taokeParams.pid = pid;
+		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-		tradeService.show(myCardCouponsPage, null, mContext, null, new TradeProcessCallback() {
+		tradeService.show(myCardCouponsPage, taokeParams, mContext, null, new TradeProcessCallback() {
 
 			@Override
 			public void onFailure(int code, String message) {
@@ -317,8 +332,13 @@ public class AliBaiChuan extends UZModule {
 			} catch (JSONException e) {
 			}
 		}
+		TaokeParams taokeParams = new TaokeParams();
+		String pid = moduleContext.optString("pid");
+		if (!StringUtils.isEmpty(pid)) {
+			taokeParams.pid = pid;
+		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-		tradeService.show(promotionsPage, null, mContext, null, new TradeProcessCallback() {
+		tradeService.show(promotionsPage, taokeParams, mContext, null, new TradeProcessCallback() {
 
 			@Override
 			public void onFailure(int code, String message) {
