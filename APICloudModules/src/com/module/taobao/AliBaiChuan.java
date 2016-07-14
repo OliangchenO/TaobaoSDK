@@ -29,7 +29,6 @@ import com.uzmap.pkg.uzcore.uzmodule.UZModuleContext;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.widget.Toast;
 
 public class AliBaiChuan extends UZModule {
 	private UZModuleContext mJsCallback;
