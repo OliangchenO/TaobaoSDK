@@ -114,15 +114,6 @@ public class LoginActivity extends AbstractActivity {
 				json.put("code", StatusEunm.SUCCESS.getCode());
 			} catch (JSONException e1) {
 			}
-//			CookieManager.getInstance().removeAllCookie();
-//			CookieSyncManager.getInstance().sync();
-//			Map<String, String[]> m = WebViewActivitySupport.getInstance().getCookies();
-//			for (Entry<String, String[]> e : m.entrySet()) {
-//				for (String s : e.getValue()) {
-//					CookieManager.getInstance().setCookie(e.getKey(), s);
-//				}
-//			}
-//			CookieSyncManager.getInstance().sync();
 			resultData.putExtra("result", json.toString());
 			setResult(RESULT_OK, resultData);
 			finish();

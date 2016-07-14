@@ -34,6 +34,7 @@ import android.widget.Toast;
 public class AliBaiChuan extends UZModule {
 	private UZModuleContext mJsCallback;
 	static final int ACTIVITY_REQUEST_CODE_A = 100;
+
 	public AliBaiChuan(UZWebView webView) {
 		super(webView);
 	}
@@ -46,16 +47,8 @@ public class AliBaiChuan extends UZModule {
 			public void onSuccess() {
 				LoginService loginService = AlibabaSDK.getService(LoginService.class);
 				loginService.setSessionListener(new SessionListener() {
-
 					@Override
 					public void onStateChanged(Session session) {
-						if (session != null) {
-							Toast.makeText(getContext(),
-									"session状态改变" + session.getUserId() + session.getUser() + session.isLogin(),
-									Toast.LENGTH_SHORT).show();
-						} else {
-							Toast.makeText(getContext(), "session is null", Toast.LENGTH_SHORT).show();
-						}
 					}
 				});
 				JSONObject ret = new JSONObject();
@@ -131,14 +124,15 @@ public class AliBaiChuan extends UZModule {
 		try {
 			Map<String, String> exParams = new HashMap<String, String>();
 			String isv_code = moduleContext.optString("isv_code");
-			if(!StringUtils.isEmpty(isv_code)){
+			if (!StringUtils.isEmpty(isv_code)) {
 				exParams.put(TradeConstants.ISV_CODE, isv_code);
+				exParams.put(TradeConstants.ITEM_DETAIL_VIEW_TYPE, TradeConstants.TAOBAO_H5_VIEW);
 			}
 			String itemId = moduleContext.optString("itemId");
 			ItemDetailPage itemDetailPage = null;
-			if(!StringUtils.isEmpty(itemId)){
+			if (!StringUtils.isEmpty(itemId)) {
 				itemDetailPage = new ItemDetailPage(itemId, exParams);
-			}else{
+			} else {
 				err.put("code", StatusEunm.ILLEGAL_ARGUMENT.getCode());
 				err.put("msg", StatusEunm.ILLEGAL_ARGUMENT.getMsg());
 				moduleContext.error(ret, err, true);
@@ -180,9 +174,9 @@ public class AliBaiChuan extends UZModule {
 			} catch (JSONException e1) {
 			}
 		}
-		
+
 	}
-	
+
 	public void jsmethod_showMyCartsPage(final UZModuleContext moduleContext) {
 		final JSONObject ret = new JSONObject();
 		final JSONObject err = new JSONObject();
@@ -267,9 +261,10 @@ public class AliBaiChuan extends UZModule {
 			}
 		});
 	}
-	
+
 	/**
 	 * 打开我的卡券包页
+	 * 
 	 * @param moduleContext
 	 */
 	public void jsmethod_showMyCardCouponsPage(final UZModuleContext moduleContext) {
@@ -356,21 +351,20 @@ public class AliBaiChuan extends UZModule {
 
 	/**
 	 * 根据商品链接打开商品页面
-	 * @param moduleContext 
-	 * url：必填 打开的链接地址
-	 * isv_code： 选填，
-	 * pid：选填
+	 * 
+	 * @param moduleContext
+	 *            url：必填 打开的链接地址 isv_code： 选填， pid：选填
 	 */
 	public void jsmethod_showPageByUrl(final UZModuleContext moduleContext) {
 		final JSONObject ret = new JSONObject();
 		final JSONObject err = new JSONObject();
-		
+
 		String url = moduleContext.optString("url");
 		Page page = null;
-		if(!StringUtils.isEmpty(url)){
+		if (!StringUtils.isEmpty(url)) {
 			String isv_code = moduleContext.optString("isv_code");
 			Map<String, Object> exParams = new HashMap<String, Object>();
-			if(!StringUtils.isEmpty(isv_code)){
+			if (!StringUtils.isEmpty(isv_code)) {
 				exParams.put(TradeConstants.ISV_CODE, isv_code);
 			}
 			page = new Page(url, exParams);
@@ -382,15 +376,15 @@ public class AliBaiChuan extends UZModule {
 			} catch (JSONException e) {
 			}
 		}
-		
-		TaokeParams taokeParams = new TaokeParams(); 
+
+		TaokeParams taokeParams = new TaokeParams();
 		String pid = moduleContext.optString("pid");
-		if(!StringUtils.isEmpty(pid)){
+		if (!StringUtils.isEmpty(pid)) {
 			taokeParams.pid = pid;
 		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-		tradeService.show(page, taokeParams, mContext, null, new TradeProcessCallback(){
-			  
+		tradeService.show(page, taokeParams, mContext, null, new TradeProcessCallback() {
+
 			@Override
 			public void onFailure(int code, String message) {
 				try {

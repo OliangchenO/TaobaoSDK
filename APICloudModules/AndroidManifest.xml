@@ -5,7 +5,7 @@
     android:versionName="1.0.0" >
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="14"
         android:targetSdkVersion="20" />
 
     <supports-screens
@@ -54,7 +54,7 @@
         </activity>
         
         <activity android:name="com.alibaba.sdk.android.login.ui.LoginWebViewActivity"/>
-        <activity android:name="com.alibaba.sdk.android.webview.BaseWebViewActivity"/>
+        <activity android:name="com.alibaba.sdk.android.webview.BaseWebViewActivity" android:theme="@android:style/Theme.NoTitleBar"/>
         <activity android:name="com.alibaba.sdk.android.webview.feedback.FeedbackActivity" android:theme="@style/feedback_title">
         </activity>
         <activity android:name="com.alibaba.sdk.android.webview.feedback.SendFeedbackActivity" android:theme="@style/feedback_title">
@@ -64,14 +64,14 @@
                 <action android:name="com.alibaba.sdk.android.hotpatch.action.HOT_PATCH"/>
             </intent-filter>
         </receiver>
-        <activity android:name="com.alibaba.sdk.android.trade.ui.TradeWebViewActivity">
+        <activity android:name="com.alibaba.sdk.android.trade.ui.TradeWebViewActivity" android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="COM_TAOBAO_TAE_SDK_TRADE_WEB_VIEW_ACTION"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:launchMode="singleTask" android:name="com.alibaba.sdk.android.trade.ui.NativeTaobaoClientActivity">
+        <activity android:launchMode="singleTask" android:name="com.alibaba.sdk.android.trade.ui.NativeTaobaoClientActivity" android:theme="@android:style/Theme.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
