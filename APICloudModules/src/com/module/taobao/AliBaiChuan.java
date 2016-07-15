@@ -135,6 +135,8 @@ public class AliBaiChuan extends UZModule {
 			String pid = moduleContext.optString("pid");
 			if (!StringUtils.isEmpty(pid)) {
 				taokeParams.pid = pid;
+			} else {
+				taokeParams.pid = Constants.PID;
 			}
 			TradeService tradeService = AlibabaSDK.getService(TradeService.class);
 			tradeService.show(itemDetailPage, taokeParams, mContext, null, new TradeProcessCallback() {
@@ -189,6 +191,8 @@ public class AliBaiChuan extends UZModule {
 			String pid = moduleContext.optString("pid");
 			if (!StringUtils.isEmpty(pid)) {
 				taokeParams.pid = pid;
+			} else {
+				taokeParams.pid = Constants.PID;
 			}
 			TradeService tradeService = AlibabaSDK.getService(TradeService.class);
 			tradeService.show(myCartsPage, taokeParams, mContext, null, new TradeProcessCallback() {
@@ -239,6 +243,8 @@ public class AliBaiChuan extends UZModule {
 		String pid = moduleContext.optString("pid");
 		if (!StringUtils.isEmpty(pid)) {
 			taokeParams.pid = pid;
+		} else {
+			taokeParams.pid = Constants.PID;
 		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
 		tradeService.show(myOrdersPage, taokeParams, mContext, null, new TradeProcessCallback() {
@@ -284,6 +290,8 @@ public class AliBaiChuan extends UZModule {
 		String pid = moduleContext.optString("pid");
 		if (!StringUtils.isEmpty(pid)) {
 			taokeParams.pid = pid;
+		} else {
+			taokeParams.pid = Constants.PID;
 		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
 		tradeService.show(myCardCouponsPage, taokeParams, mContext, null, new TradeProcessCallback() {
@@ -320,10 +328,11 @@ public class AliBaiChuan extends UZModule {
 	public void jsmethod_showPromotionsPage(final UZModuleContext moduleContext) {
 		final JSONObject ret = new JSONObject();
 		final JSONObject err = new JSONObject();
-		String shop = moduleContext.optString("shopId");
+		String type = moduleContext.optString("type");
+		String content = moduleContext.optString("content");
 		PromotionsPage promotionsPage = null;
-		if (StringUtils.isEmpty(shop)) {
-			promotionsPage = new PromotionsPage("shop", shop);
+		if (!StringUtils.isEmpty(type) && !StringUtils.isEmpty(content)) {
+			promotionsPage = new PromotionsPage(type, content);
 		} else {
 			try {
 				err.put("code", StatusEunm.ILLEGAL_ARGUMENT.getCode());
@@ -336,6 +345,8 @@ public class AliBaiChuan extends UZModule {
 		String pid = moduleContext.optString("pid");
 		if (!StringUtils.isEmpty(pid)) {
 			taokeParams.pid = pid;
+		} else {
+			taokeParams.pid = Constants.PID;
 		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
 		tradeService.show(promotionsPage, taokeParams, mContext, null, new TradeProcessCallback() {
@@ -372,7 +383,7 @@ public class AliBaiChuan extends UZModule {
 	 * 根据商品链接打开商品页面
 	 * 
 	 * @param moduleContext
-	 *            url：必填 打开的链接地址 isv_code： 选填， pid：选填
+	 * url：必填 打开的链接地址 isv_code： 选填， pid：选填
 	 */
 	public void jsmethod_showPageByUrl(final UZModuleContext moduleContext) {
 		final JSONObject ret = new JSONObject();
@@ -400,6 +411,8 @@ public class AliBaiChuan extends UZModule {
 		String pid = moduleContext.optString("pid");
 		if (!StringUtils.isEmpty(pid)) {
 			taokeParams.pid = pid;
+		} else {
+			taokeParams.pid = Constants.PID;
 		}
 		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
 		tradeService.show(page, taokeParams, mContext, null, new TradeProcessCallback() {
