@@ -17,41 +17,41 @@ p {
 }
 </style>
 <script type="text/javascript">
-	var alibaba = null;
+	var taobao = null;
 	apiready = function() {
-		alibaba = api.require('alibaba');
+		taobao = api.require('taobao');
 	}
 	
 	function asyncInit(){
-		alibaba.asyncInit(function(ret,err){
+		taobao.asyncInit(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
 	function showLogin(){
-		alibaba.showLogin(function(ret,err){
+		taobao.showLogin(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
 	function getUserInfo(){
-		alibaba.getUserInfo(function(ret,err){
+		taobao.getUserInfo(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
 	function logout(){
-		alibaba.logout(function(ret,err){
+		taobao.logout(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
 	function showCart(){
-		alibaba.showMyCartsPage(function(ret,err){
+		taobao.showMyCartsPage(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
@@ -59,7 +59,7 @@ p {
 	
 	function showOrder(){
 		var param = {type:1,allOrder:false};
-		alibaba.showMyOrdersPage(param,function(ret,err){
+		taobao.showMyOrdersPage(param,function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
@@ -67,14 +67,14 @@ p {
 	
 	function showItemDetailPage(){
 		var param = {itemId:'527499129604'};
-		alibaba.showItemDetailPage(param, function(ret,err){
+		taobao.showItemDetailPage(param, function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
 	function showMyCardCouponsPage(){
-		alibaba.showMyCardCouponsPage(function(ret,err){
+		taobao.showMyCardCouponsPage(function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
@@ -82,15 +82,15 @@ p {
 	
 	function showPromotionsPage(){
 		var param = {shop:"123456"};
-		alibaba.showPromotionsPage(param, function(ret,err){
+		taobao.showPromotionsPage(param, function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})
 	}
 	
 	function showPageByUrl(){
-		var param = {url:"https://chaoshi.detail.tmall.com/item.htm?spm=a3204.8100662.4126610234.2.8EcSy0&id=529349310313&acm=lb-zebra-169886-1116122.1003.4.929918&scm=1003.4.lb-zebra-169886-1116122.ITEM_529349310313_929918"};
-		alibaba.showPageByUrl(param, function(ret,err){
+		var param = {url:"https://detail.tmall.com/item.htm?id=534933758915&ali_trackid=2:mm_27137912_10370870_53086859:1473743110_212_1681400711&pvid=50_125.79.189.65_372_1473735210882"};
+		taobao.showPageByUrl(param, function(ret,err){
 			alert(JSON.stringify(ret));
 			alert(JSON.stringify(err));
 		})

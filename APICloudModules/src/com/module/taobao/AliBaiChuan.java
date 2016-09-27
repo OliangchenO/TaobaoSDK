@@ -16,6 +16,8 @@ import com.alibaba.sdk.android.trade.callback.TradeProcessCallback;
 import com.alibaba.sdk.android.trade.model.TaokeParams;
 import com.alibaba.sdk.android.trade.model.TradeResult;
 import com.alibaba.sdk.android.trade.page.*;
+import com.alibaba.sdk.android.util.CommonUtils;
+import com.alibaba.sdk.android.webview.UiSettings;
 import com.ta.utdid2.android.utils.StringUtils;
 import com.taobao.tae.sdk.callback.InitResultCallback;
 import com.uzmap.pkg.uzcore.UZWebView;
@@ -120,8 +122,8 @@ public class AliBaiChuan extends UZModule {
 			String isv_code = moduleContext.optString("isv_code");
 			if (!StringUtils.isEmpty(isv_code)) {
 				exParams.put(TradeConstants.ISV_CODE, isv_code);
-				exParams.put(TradeConstants.ITEM_DETAIL_VIEW_TYPE, TradeConstants.TAOBAO_H5_VIEW);
 			}
+			exParams.put(TradeConstants.ITEM_DETAIL_VIEW_TYPE, TradeConstants.TAOBAO_H5_VIEW);
 			String itemId = moduleContext.optString("itemId");
 			ItemDetailPage itemDetailPage = null;
 			if (!StringUtils.isEmpty(itemId)) {
@@ -397,6 +399,7 @@ public class AliBaiChuan extends UZModule {
 			if (!StringUtils.isEmpty(isv_code)) {
 				exParams.put(TradeConstants.ISV_CODE, isv_code);
 			}
+			exParams.put(TradeConstants.ITEM_DETAIL_VIEW_TYPE, TradeConstants.TAOBAO_H5_VIEW);
 			page = new Page(url, exParams);
 		} else {
 			try {
@@ -414,8 +417,7 @@ public class AliBaiChuan extends UZModule {
 		} else {
 			taokeParams.pid = Constants.PID;
 		}
-		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
-		tradeService.show(page, taokeParams, mContext, null, new TradeProcessCallback() {
+		TradeProcessCallback tradeProcessCallback = new TradeProcessCallback() {
 
 			@Override
 			public void onFailure(int code, String message) {
@@ -442,7 +444,9 @@ public class AliBaiChuan extends UZModule {
 				} catch (JSONException e) {
 				}
 			}
-		});
+		};
+		TradeService tradeService = AlibabaSDK.getService(TradeService.class);
+		tradeService.show(page, taokeParams, this.getContext(), null, tradeProcessCallback);
 	}
 
 	@Override
